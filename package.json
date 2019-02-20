@@ -1,0 +1,31 @@
+{
+  "name": "jpi-errors",
+  "version": "0.0.0",
+  "description": "jpi error classes and handling utils",
+  "author": "Steve Ripberger",
+  "license": "MIT",
+  "repository": "github:sripberger/jpi-errors",
+  "scripts": {
+    "lint": "eslint .",
+    "unit": "mocha -r esm test/setup.js test/unit",
+    "integration": "mocha -r esm test/setup.js test/integration",
+    "test": "npm run lint && npm run unit && npm run integration",
+    "docs": "documentation build ./lib/index.js -c docs.yaml -f html -o docs",
+    "postversion": "npm run docs && gh-pages -d docs && git push && git push --tags"
+  },
+  "main": "cjs",
+  "dependencies": {
+    "esm": "^3.2.5"
+  },
+  "devDependencies": {
+    "@sripberger/eslint-config": "^1.0.1",
+    "chai": "^4.2.0",
+    "documentation": "^9.1.1",
+    "eslint": "^5.14.1",
+    "eslint-plugin-jsdoc": "^3.15.1",
+    "gh-pages": "^2.0.1",
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.4",
+    "sinon-chai": "^3.3.0"
+  }
+}
