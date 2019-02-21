@@ -15,7 +15,8 @@
   },
   "main": "cjs",
   "dependencies": {
-    "esm": "^3.2.5"
+    "esm": "^3.2.5",
+    "nani": "^2.0.0"
   },
   "devDependencies": {
     "@sripberger/eslint-config": "^1.0.1",
