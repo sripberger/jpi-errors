@@ -1,143 +1,103 @@
+/* eslint max-classes-per-file: off */
+const { NaniError, MultiError } = require('nani');
 const { toObject } = require('../../cjs');
 
-describe.skip('toObject', function() {
-	const message = 'Error message';
-	const name = 'TestError';
-	let err;
+describe('toObject', function() {
+	it('converts standard js errors into JSON-RPC error objects', function() {
+		// Try a plain Error.
+		expect(toObject(new Error('Omg bad error!'))).to.deep.equal({
+			message: 'Omg bad error!',
+			data: { name: 'Error', fullName: 'Error' },
+		});
 
-	beforeEach(function() {
-		err = new Error(message);
-		err.name = name;
-	});
-
-	it('converts an error into a JSON-RPC error object', function() {
-		expect(toObject(err)).to.deep.equal({
-			message,
-			data: { name },
+		// Try a TypeError.
+		expect(toObject(new TypeError('Omg type was wrong!'))).to.deep.equal({
+			message: 'Omg type was wrong!',
+			data: { name: 'TypeError', fullName: 'Error.TypeError' },
 		});
 	});
 
-	it('includes code at top level, if it is an integer', function() {
-		const code = err.code = 0;
+	it('converts arbitrary NaniErrors into JSON-RPC error objects', function() {
+		// Create some subclasses.
+		class FooError extends NaniError {}
+		class BarError extends FooError {}
 
-		expect(toObject(err)).to.deep.equal({
-			message,
-			code,
-			data: { name },
+		// Create a big, crazy error structure to test all the things.
+		const err = new FooError({
+			shortMessage: 'foo',
+			info: { omg: 'wow' },
+			cause: new BarError('bar', new MultiError(
+				new FooError('nested foo', new Error('whatever')),
+				new BarError('nested bar', { info: { yay: 'huzzah' } })
+			)),
 		});
-	});
 
-	it('includes code in data, if it is not an integer', function() {
-		const code = err.code = 3.14;
-
+		// Convert the structure and check the result.
 		expect(toObject(err)).to.deep.equal({
-			message,
-			data: { name, code },
-		});
-	});
-
-	it('supports cause as converted object in data, if any', function() {
-		err.cause = new Error('Cause of error');
-		err.cause.name = 'CauseError';
-		err.cause.cause = new Error('Cause of cause of error');
-		err.cause.cause.name = 'CauseCauseError';
-
-		expect(toObject(err)).to.deep.equal({
-			message,
+			message: 'foo : bar : First of 2 errors : nested foo : whatever',
 			data: {
-				name,
+				name: FooError.name,
+				fullName: FooError.fullName,
+				shortMessage: 'foo',
+				info: { omg: 'wow' },
 				cause: {
-					message: err.cause.message,
+					message: 'bar : First of 2 errors : nested foo : whatever',
 					data: {
-						name: err.cause.name,
+						shortMessage: 'bar',
+						name: BarError.name,
+						fullName: BarError.fullName,
 						cause: {
-							message: err.cause.cause.message,
-							data: { name: err.cause.cause.name },
-						},
-					},
-				},
-			},
-		});
-	});
-
-	it('includes converted errors array instead of cause, if any', function() {
-		const fooErr = new Error('Foo error');
-		fooErr.name = 'FooError';
-		fooErr.cause = new Error('Cause of foo error');
-		const barErr = new Error('Bar error');
-		barErr.name = 'BarError';
-		err.errors = [ fooErr, barErr ];
-		err.cause = new Error('Should be ignored');
-
-		expect(toObject(err)).to.deep.equal({
-			message,
-			data: {
-				name,
-				errors: [
-					{
-						message: fooErr.message,
-						data: {
-							name: fooErr.name,
-							cause: {
-								message: fooErr.cause.message,
-								data: { name: fooErr.cause.name },
+							message: 'First of 2 errors : nested foo' +
+								' : whatever',
+							data: {
+								name: MultiError.name,
+								fullName: MultiError.fullName,
+								shortMessage: 'First of 2 errors : nested foo',
+								cause: {
+									message: 'nested foo : whatever',
+									data: {
+										name: FooError.name,
+										fullName: FooError.fullName,
+										shortMessage: 'nested foo',
+										cause: {
+											message: 'whatever',
+											data: {
+												name: 'Error',
+												fullName: 'Error',
+											},
+										},
+									},
+								},
+								errors: [
+									{
+										message: 'nested foo : whatever',
+										data: {
+											name: FooError.name,
+											fullName: FooError.fullName,
+											shortMessage: 'nested foo',
+											cause: {
+												message: 'whatever',
+												data: {
+													name: 'Error',
+													fullName: 'Error',
+												},
+											},
+										},
+									},
+									{
+										message: 'nested bar',
+										data: {
+											name: BarError.name,
+											fullName: BarError.fullName,
+											shortMessage: 'nested bar',
+											info: { yay: 'huzzah' },
+										},
+									},
+								],
 							},
 						},
 					},
-					{
-						message: barErr.message,
-						data: { name: barErr.name },
-					},
-				],
-			},
-		});
-	});
-
-	it('handles circular references in the cause chain', function() {
-		err.cause = new Error('Cause of error');
-		err.cause.name = 'CauseError';
-		err.cause.cause = err;
-
-		expect(toObject(err)).to.deep.equal({
-			message: err.message,
-			data: {
-				name: err.name,
-				cause: {
-					message: err.cause.message,
-					data: { name: err.cause.name },
 				},
-			},
-		});
-	});
-
-	it('handles circular references in the errors array', function() {
-		const fooErr = new Error('Foo error');
-		fooErr.name = 'FooError';
-		const barErr = new Error('Bar error');
-		barErr.name = 'BarError';
-		barErr.cause = fooErr;
-		err.errors = [ fooErr, barErr, err ];
-
-		expect(toObject(err)).to.deep.equal({
-			message: err.message,
-			data: {
-				name: err.name,
-				errors: [
-					{
-						message: fooErr.message,
-						data: { name: fooErr.name },
-					},
-					{
-						message: barErr.message,
-						data: {
-							name: barErr.name,
-							cause: {
-								message: fooErr.message,
-								data: { name: fooErr.name },
-							},
-						},
-					},
-				],
 			},
 		});
 	});
