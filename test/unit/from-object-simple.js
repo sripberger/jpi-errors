@@ -9,15 +9,12 @@ describe('fromObjectSimple', function() {
 		obj = { message: 'Error message', data };
 	});
 
-	it('returns an error instance with message and name.', function() {
-		data.name = 'TestError';
-
+	it('converts object to an error instance with message', function() {
 		const result = fromObjectSimple(obj);
 
 		expect(result).to.be.an.instanceof(Error);
-		expect(result).to.have.keys([ 'name' ]); // message is not iterable.
+		expect(result).to.be.empty; // message is not iterable.
 		expect(result.message).to.equal(obj.message);
-		expect(result.name).to.equal(data.name);
 	});
 
 	it('supports missing data', function() {
@@ -27,6 +24,15 @@ describe('fromObjectSimple', function() {
 
 		expect(result).to.be.an.instanceof(Error);
 		expect(result).to.be.empty; // message is not iterable.
+		expect(result.message).to.equal(obj.message);
+	});
+
+	it('includes name, if present in data', function() {
+		data.name = 'TestError';
+
+		const result = fromObjectSimple(obj);
+
+		expect(result.name).to.equal(data.name);
 	});
 
 	it('includes code, if present at top level', function() {
