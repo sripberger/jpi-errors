@@ -25,9 +25,9 @@ describe('Converter', function() {
 			converter = new Converter();
 			err = new Error('Omg bad error!');
 			obj = { message: err.message, data: {} };
+			toObjectSimple = sinon.stub(toObjectSimpleModule, 'toObjectSimple');
 
-			toObjectSimple = sinon.stub(toObjectSimpleModule, 'toObjectSimple')
-				.withArgs(err).returns(obj);
+			toObjectSimple.withArgs(err).returns(obj);
 		});
 
 		it('converts err to obj using toObjectSimple and includeStacks setting', function() {
@@ -92,7 +92,7 @@ describe('Converter', function() {
 			expect(converter.objectsByError).to.be.empty;
 		});
 
-		it('does nothing if cause alread set and inArray is false', function() {
+		it('does nothing if cause already set and inArray is false', function() {
 			const cause = { foo: 'bar' };
 			const parent = new Error('Parent error');
 			const parentObj = { data: { cause } };
