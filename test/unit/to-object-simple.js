@@ -49,6 +49,15 @@ describe('toObjectSimple', function() {
 		});
 	});
 
+	it('includes shortMessage in data, if any', function() {
+		const shortMessage = err.shortMessage = 'Short error message';
+
+		expect(toObjectSimple(err)).to.deep.equal({
+			message,
+			data: { name, shortMessage },
+		});
+	});
+
 	it('includes error info in data, if any', function() {
 		const info = err.info = { foo: 'bar' };
 
