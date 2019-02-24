@@ -17,7 +17,7 @@ describe('toObjectSimple', function() {
 		sinon.stub(nani, 'is').returns(false);
 	});
 
-	it('converts an error into a JSON-RPC error object', function() {
+	it('includes message at top level', function() {
 		expect(toObjectSimple(err)).to.deep.equal({ message });
 	});
 

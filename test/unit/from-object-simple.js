@@ -2,24 +2,31 @@ import { fromObjectSimple } from '../../lib/from-object-simple';
 import { naniProperties } from '../../lib/nani-properties';
 
 describe('fromObjectSimple', function() {
-	const message = 'some error message';
-	const name = 'SomeError';
 	let data, obj;
 
 	beforeEach(function() {
-		data = { name };
-		obj = { message, data };
+		data = {};
+		obj = { message: 'Error message', data };
 	});
 
-	it('converts a JSON-RPC error object into an Error instance', function() {
+	it('returns an error instance with message and name.', function() {
+		data.name = 'TestError';
+
 		const result = fromObjectSimple(obj);
 
 		expect(result).to.be.an.instanceof(Error);
-		expect(result.message).to.equal(message);
-		expect(result.name).to.equal(name);
-		// Make sure there aren't any extra properties.
-		// Note that `message` is not enumerable.
-		expect(result).to.have.keys([ 'name' ]);
+		expect(result).to.have.keys([ 'name' ]); // message is not iterable.
+		expect(result.message).to.equal(obj.message);
+		expect(result.name).to.equal(data.name);
+	});
+
+	it('supports missing data', function() {
+		delete obj.data;
+
+		const result = fromObjectSimple(obj);
+
+		expect(result).to.be.an.instanceof(Error);
+		expect(result).to.be.empty; // message is not iterable.
 	});
 
 	it('includes code, if present at top level', function() {
