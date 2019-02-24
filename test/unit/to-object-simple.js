@@ -1,6 +1,11 @@
 import * as nani from 'nani';
+import { assign, keyBy, mapValues } from 'lodash';
 import { JpiError } from '../../lib/jpi-error';
+import { naniProperties } from '../../lib/nani-properties';
 import { toObjectSimple } from '../../lib/to-object-simple';
+
+// Transform naniProperties into an object we can easily assign onto stuff.
+const naniObj = mapValues(keyBy(naniProperties), (p) => `${p} value`);
 
 describe('toObjectSimple', function() {
 	const message = 'Error message';
@@ -71,23 +76,19 @@ describe('toObjectSimple', function() {
 			nani.is.withArgs(nani.NaniError, err).returns(true);
 		});
 
-		it('includes NaniError properties in data', function() {
-			const fullName = err.fullName = 'Full error name';
-			const shortMessage = err.shortMessage = 'Short error message';
-			const info = err.info = { foo: 'bar' };
+		it('includes naniProperties in data', function() {
+			assign(err, naniObj);
 
 			expect(toObjectSimple(err)).to.deep.equal({
 				message,
-				data: { name, fullName, shortMessage, info },
+				data: assign({ name }, naniObj),
 			});
 		});
 	});
 
 	context('err is not a NaniError', function() {
-		it('ignores NaniError properties', function() {
-			err.fullName = 'Full error name';
-			err.shortMessage = 'Short error message';
-			err.info = { foo: 'bar' };
+		it('ignores naniProperties', function() {
+			assign(err, naniObj);
 
 			expect(toObjectSimple(err)).to.deep.equal({
 				message,
