@@ -12,7 +12,6 @@ describe('toObjectSimple', function() {
 		err.name = name;
 
 		sinon.stub(nani, 'is').returns(false);
-		sinon.stub(nani, 'getFullName').returns(null);
 	});
 
 	it('converts an error into a JSON-RPC error object', function() {
@@ -67,53 +66,37 @@ describe('toObjectSimple', function() {
 		});
 	});
 
-	it('includes fullName in data, if any', function() {
-		const fullName = 'Full error name';
-		nani.getFullName.withArgs(err).returns(fullName);
+	context('err is a NaniError', function() {
+		beforeEach(function() {
+			nani.is.withArgs(nani.NaniError, err).returns(true);
+		});
 
-		expect(toObjectSimple(err)).to.deep.equal({
-			message,
-			data: { name, fullName },
+		it('includes NaniError properties in data', function() {
+			const fullName = err.fullName = 'Full error name';
+			const shortMessage = err.shortMessage = 'Short error message';
+			const info = err.info = { foo: 'bar' };
+
+			expect(toObjectSimple(err)).to.deep.equal({
+				message,
+				data: { name, fullName, shortMessage, info },
+			});
 		});
 	});
 
-	it('includes shortMessage in data, if any', function() {
-		const shortMessage = err.shortMessage = 'Short error message';
+	context('err is not a NaniError', function() {
+		it('ignores NaniError properties', function() {
+			err.fullName = 'Full error name';
+			err.shortMessage = 'Short error message';
+			err.info = { foo: 'bar' };
 
-		expect(toObjectSimple(err)).to.deep.equal({
-			message,
-			data: { name, shortMessage },
+			expect(toObjectSimple(err)).to.deep.equal({
+				message,
+				data: { name },
+			});
 		});
 	});
 
-	it('supports undefined shortMessage', function() {
-		err.shortMessage = undefined;
-
-		expect(toObjectSimple(err)).to.deep.equal({
-			message,
-			data: { name, shortMessage: undefined },
-		});
-	});
-
-	it('includes error info in data, if any', function() {
-		const info = err.info = { foo: 'bar' };
-
-		expect(toObjectSimple(err)).to.deep.equal({
-			message,
-			data: { name, info },
-		});
-	});
-
-	it('supports undefined info', function() {
-		err.info = undefined;
-
-		expect(toObjectSimple(err)).to.deep.equal({
-			message,
-			data: { name, info: undefined },
-		});
-	});
-
-	it('includes stack, if specified', function() {
+	it('includes stack in data, if specified', function() {
 		expect(toObjectSimple(err, true)).to.deep.equal({
 			message,
 			data: { name, stack: err.stack },

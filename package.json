@@ -16,6 +16,7 @@
   "main": "cjs",
   "dependencies": {
     "esm": "^3.2.6",
+    "lodash": "^4.17.11",
     "nani": "^2.2.0"
   },
   "devDependencies": {

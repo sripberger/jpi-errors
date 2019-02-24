@@ -7,13 +7,13 @@ describe('toObject', function() {
 		// Try a plain Error.
 		expect(toObject(new Error('Omg bad error!'))).to.deep.equal({
 			message: 'Omg bad error!',
-			data: { name: 'Error', fullName: 'Error' },
+			data: { name: 'Error' },
 		});
 
 		// Try a TypeError.
 		expect(toObject(new TypeError('Omg type was wrong!'))).to.deep.equal({
 			message: 'Omg type was wrong!',
-			data: { name: 'TypeError', fullName: 'Error.TypeError' },
+			data: { name: 'TypeError' },
 		});
 	});
 
@@ -43,9 +43,10 @@ describe('toObject', function() {
 				cause: {
 					message: 'bar : First of 2 errors : nested foo : whatever',
 					data: {
-						shortMessage: 'bar',
 						name: BarError.name,
 						fullName: BarError.fullName,
+						shortMessage: 'bar',
+						info: null,
 						cause: {
 							message: 'First of 2 errors : nested foo' +
 								' : whatever',
@@ -53,18 +54,17 @@ describe('toObject', function() {
 								name: MultiError.name,
 								fullName: MultiError.fullName,
 								shortMessage: 'First of 2 errors : nested foo',
+								info: null,
 								cause: {
 									message: 'nested foo : whatever',
 									data: {
 										name: FooError.name,
 										fullName: FooError.fullName,
 										shortMessage: 'nested foo',
+										info: null,
 										cause: {
 											message: 'whatever',
-											data: {
-												name: 'Error',
-												fullName: 'Error',
-											},
+											data: { name: 'Error' },
 										},
 									},
 								},
@@ -75,12 +75,10 @@ describe('toObject', function() {
 											name: FooError.name,
 											fullName: FooError.fullName,
 											shortMessage: 'nested foo',
+											info: null,
 											cause: {
 												message: 'whatever',
-												data: {
-													name: 'Error',
-													fullName: 'Error',
-												},
+												data: { name: 'Error' },
 											},
 										},
 									},
@@ -119,12 +117,14 @@ describe('toObject', function() {
 				name: ServerError.name,
 				fullName: ServerError.fullName,
 				shortMessage: 'foo',
+				info: null,
 				cause: {
 					message: 'bar : baz',
 					data: {
 						name: JpiError.name,
 						fullName: JpiError.fullName,
 						shortMessage: 'bar',
+						info: null,
 						cause: {
 							message: 'baz',
 							code: ParseError.code,
@@ -132,6 +132,7 @@ describe('toObject', function() {
 								name: ParseError.name,
 								fullName: ParseError.fullName,
 								shortMessage: 'baz',
+								info: null,
 							},
 						},
 					},
@@ -152,11 +153,11 @@ describe('toObject', function() {
 				name: 'NaniError',
 				fullName: 'Error.NaniError',
 				shortMessage: 'Omg bad error!',
+				info: null,
 				cause: {
 					message: 'Cause of error',
 					data: {
 						name: 'Error',
-						fullName: 'Error',
 						stack: cause.stack,
 					},
 				},
