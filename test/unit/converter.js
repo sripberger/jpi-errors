@@ -3,21 +3,26 @@ import * as toObjectSimpleModule from '../../lib/to-object-simple';
 import { Converter } from '../../lib/converter';
 
 describe('Converter', function() {
-	let converter;
+	it('supports includeStacks argument', function() {
+		expect(new Converter(true).includeStacks).to.be.true;
+	});
 
-	beforeEach(function() {
-		converter = new Converter();
+	it('defaults to includeStacks false', function() {
+		expect(new Converter().includeStacks).to.be.false;
 	});
 
 	it('creates an empty map on objectsByError', function() {
+		const converter = new Converter();
+
 		expect(converter.objectsByError).to.be.an.instanceof(Map);
 		expect(converter.objectsByError).to.be.empty;
 	});
 
 	describe('#add', function() {
-		let err, obj, toObjectSimple;
+		let converter, err, obj, toObjectSimple;
 
 		beforeEach(function() {
+			converter = new Converter();
 			err = new Error('Omg bad error!');
 			obj = { message: err.message, data: {} };
 
@@ -25,11 +30,16 @@ describe('Converter', function() {
 				.withArgs(err).returns(obj);
 		});
 
-		it('converts err to obj using toObjectSimple', function() {
+		it('converts err to obj using toObjectSimple and includeStacks setting', function() {
+			converter.includeStacks = 'includeStacks value';
+
 			converter.add({ err, parent: null, inArray: false });
 
 			expect(toObjectSimple).to.be.calledOnce;
-			expect(toObjectSimple).to.be.calledWith(err);
+			expect(toObjectSimple).to.be.calledWith(
+				err,
+				converter.includeStacks
+			);
 		});
 
 		it('stores obj in objectsByError', function() {
@@ -97,9 +107,10 @@ describe('Converter', function() {
 	});
 
 	describe('#convert', function() {
-		let err, items;
+		let converter, err, items;
 
 		beforeEach(function() {
+			converter = new Converter();
 			err = new Error('Omg bad error!');
 			items = [ { foo: 'bar' }, { baz: 'qux' } ];
 

@@ -101,4 +101,27 @@ describe('toObject', function() {
 			},
 		});
 	});
+
+	it('supports includeStacks argument', function() {
+		const cause = new Error('Cause of error');
+		const err = new NaniError('Omg bad error!', cause);
+
+		expect(toObject(err, true)).to.deep.equal({
+			message: 'Omg bad error! : Cause of error',
+			data: {
+				name: 'NaniError',
+				fullName: 'Error.NaniError',
+				shortMessage: 'Omg bad error!',
+				cause: {
+					message: 'Cause of error',
+					data: {
+						name: 'Error',
+						fullName: 'Error',
+						stack: cause.stack,	
+					}
+				},
+				stack: err.stack,
+			},
+		});
+	});
 });
