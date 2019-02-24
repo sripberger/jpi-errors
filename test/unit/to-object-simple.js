@@ -9,17 +9,21 @@ const naniObj = mapValues(keyBy(naniProperties), (p) => `${p} value`);
 
 describe('toObjectSimple', function() {
 	const message = 'Error message';
-	const name = 'TestError';
 	let err;
 
 	beforeEach(function() {
 		err = new Error(message);
-		err.name = name;
 
 		sinon.stub(nani, 'is').returns(false);
 	});
 
 	it('converts an error into a JSON-RPC error object', function() {
+		expect(toObjectSimple(err)).to.deep.equal({ message });
+	});
+
+	it('includes name in data, if it is not \'Error\'', function() {
+		const name = err.name = 'TestError';
+
 		expect(toObjectSimple(err)).to.deep.equal({
 			message,
 			data: { name },
@@ -34,20 +38,13 @@ describe('toObjectSimple', function() {
 		it('includes code at top level if it is an integer', function() {
 			const code = err.code = 42;
 
-			expect(toObjectSimple(err)).to.deep.equal({
-				message,
-				code,
-				data: { name },
-			});
+			expect(toObjectSimple(err)).to.deep.equal({ message, code });
 		});
 
 		it('ignores code if it is not an integer', function() {
 			err.code = 3.14;
 
-			expect(toObjectSimple(err)).to.deep.equal({
-				message,
-				data: { name },
-			});
+			expect(toObjectSimple(err)).to.deep.equal({ message });
 		});
 	});
 
@@ -57,7 +54,7 @@ describe('toObjectSimple', function() {
 
 			expect(toObjectSimple(err)).to.deep.equal({
 				message,
-				data: { name, code },
+				data: { code },
 			});
 		});
 
@@ -66,41 +63,31 @@ describe('toObjectSimple', function() {
 
 			expect(toObjectSimple(err)).to.deep.equal({
 				message,
-				data: { name, code: undefined },
+				data: { code: undefined },
 			});
 		});
 	});
 
-	context('err is a NaniError', function() {
-		beforeEach(function() {
-			nani.is.withArgs(nani.NaniError, err).returns(true);
-		});
+	it('includes naniProperties in data if err is a NaniError', function() {
+		nani.is.withArgs(nani.NaniError, err).returns(true);
+		assign(err, naniObj);
 
-		it('includes naniProperties in data', function() {
-			assign(err, naniObj);
-
-			expect(toObjectSimple(err)).to.deep.equal({
-				message,
-				data: assign({ name }, naniObj),
-			});
+		expect(toObjectSimple(err)).to.deep.equal({
+			message,
+			data: naniObj,
 		});
 	});
 
-	context('err is not a NaniError', function() {
-		it('ignores naniProperties', function() {
-			assign(err, naniObj);
+	it('ignores naniProperties if err is not a NaniError', function() {
+		assign(err, naniObj);
 
-			expect(toObjectSimple(err)).to.deep.equal({
-				message,
-				data: { name },
-			});
-		});
+		expect(toObjectSimple(err)).to.deep.equal({ message });
 	});
 
 	it('includes stack in data, if specified', function() {
 		expect(toObjectSimple(err, true)).to.deep.equal({
 			message,
-			data: { name, stack: err.stack },
+			data: { stack: err.stack },
 		});
 	});
 });

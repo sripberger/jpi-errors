@@ -7,7 +7,6 @@ describe('toObject', function() {
 		// Try a plain Error.
 		expect(toObject(new Error('Omg bad error!'))).to.deep.equal({
 			message: 'Omg bad error!',
-			data: { name: 'Error' },
 		});
 
 		// Try a TypeError.
@@ -62,10 +61,7 @@ describe('toObject', function() {
 										fullName: FooError.fullName,
 										shortMessage: 'nested foo',
 										info: null,
-										cause: {
-											message: 'whatever',
-											data: { name: 'Error' },
-										},
+										cause: { message: 'whatever' },
 									},
 								},
 								errors: [
@@ -76,10 +72,7 @@ describe('toObject', function() {
 											fullName: FooError.fullName,
 											shortMessage: 'nested foo',
 											info: null,
-											cause: {
-												message: 'whatever',
-												data: { name: 'Error' },
-											},
+											cause: { message: 'whatever' },
 										},
 									},
 									{
@@ -156,10 +149,7 @@ describe('toObject', function() {
 				info: null,
 				cause: {
 					message: 'Cause of error',
-					data: {
-						name: 'Error',
-						stack: cause.stack,
-					},
+					data: { stack: cause.stack },
 				},
 				stack: err.stack,
 			},
