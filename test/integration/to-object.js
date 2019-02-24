@@ -1,6 +1,6 @@
 /* eslint max-classes-per-file: off */
 const { NaniError, MultiError } = require('nani');
-const { toObject } = require('../../cjs');
+const { toObject, JpiError, ParseError, ServerError } = require('../../cjs');
 
 describe('toObject', function() {
 	it('converts standard js errors into JSON-RPC error objects', function() {
@@ -102,10 +102,50 @@ describe('toObject', function() {
 		});
 	});
 
+	it('converts JpiErrors into JSON-RPC error objects', function() {
+		// Create a structure of JpiErrors. These are NaniErrors, so there is
+		// no need to test everything again. We just want to make sure the
+		// numeric codes supported.
+		const err = new ServerError({
+			shortMessage: 'foo',
+			cause: new JpiError('bar', new ParseError('baz')),
+		});
+
+		// Convert the structure and check the result.
+		expect(toObject(err)).to.deep.equal({
+			message: 'foo : bar : baz',
+			code: ServerError.code,
+			data: {
+				name: ServerError.name,
+				fullName: ServerError.fullName,
+				shortMessage: 'foo',
+				cause: {
+					message: 'bar : baz',
+					data: {
+						name: JpiError.name,
+						fullName: JpiError.fullName,
+						shortMessage: 'bar',
+						cause: {
+							message: 'baz',
+							code: ParseError.code,
+							data: {
+								name: ParseError.name,
+								fullName: ParseError.fullName,
+								shortMessage: 'baz',
+							},
+						},
+					},
+				},
+			},
+		});
+	});
+
 	it('supports includeStacks argument', function() {
+		// Create a simple structure.
 		const cause = new Error('Cause of error');
 		const err = new NaniError('Omg bad error!', cause);
 
+		// Convert the structure and make sure the stacks are there.
 		expect(toObject(err, true)).to.deep.equal({
 			message: 'Omg bad error! : Cause of error',
 			data: {
@@ -117,8 +157,8 @@ describe('toObject', function() {
 					data: {
 						name: 'Error',
 						fullName: 'Error',
-						stack: cause.stack,	
-					}
+						stack: cause.stack,
+					},
 				},
 				stack: err.stack,
 			},
