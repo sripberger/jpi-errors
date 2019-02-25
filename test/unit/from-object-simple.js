@@ -97,4 +97,26 @@ describe('fromObjectSimple', function() {
 			expect(result[prop]).to.be.undefined;
 		});
 	}
+
+	it('overwites stack with stack from data, if present', function() {
+		data.stack = 'stack trace I guess';
+
+		const result = fromObjectSimple(obj);
+
+		expect(result.stack).to.equal(data.stack);
+	});
+
+	it('overwrites stack with frameless substitute, if not present in data', function() {
+		const result = fromObjectSimple(obj);
+
+		expect(result.stack).to.equal(`Error: ${obj.message}`);
+	});
+
+	it('supports non-default error name in frameless stack substitute', function() {
+		data.name = 'TestError';
+
+		const result = fromObjectSimple(obj);
+
+		expect(result.stack).to.equal(`${data.name}: ${obj.message}`);
+	});
 });
