@@ -1,6 +1,7 @@
-/* eslint max-classes-per-file: off */
-const { NaniError, MultiError } = require('nani');
-const { toObject, JpiError, ParseError, ServerError } = require('../../cjs');
+const jpiStructure = require('../utils/jpi-structure');
+const naniStructure = require('../utils/nani-structure');
+const { NaniError } = require('nani');
+const { toObject } = require('../../cjs');
 
 describe('toObject', function() {
 	it('converts standard js errors into JSON-RPC error objects', function() {
@@ -17,121 +18,13 @@ describe('toObject', function() {
 	});
 
 	it('converts arbitrary NaniErrors into JSON-RPC error objects', function() {
-		// Create some subclasses.
-		class FooError extends NaniError {}
-		class BarError extends FooError {}
-
-		// Create a big, crazy error structure to test all the things.
-		const err = new FooError({
-			shortMessage: 'foo',
-			info: { omg: 'wow' },
-			cause: new BarError('bar', new MultiError(
-				new FooError('nested foo', new Error('whatever')),
-				new BarError('nested bar', { info: { yay: 'huzzah' } })
-			)),
-		});
-
-		// Convert the structure and check the result.
-		expect(toObject(err)).to.deep.equal({
-			message: 'foo : bar : First of 2 errors : nested foo : whatever',
-			data: {
-				name: FooError.name,
-				fullName: FooError.fullName,
-				shortMessage: 'foo',
-				info: { omg: 'wow' },
-				cause: {
-					message: 'bar : First of 2 errors : nested foo : whatever',
-					data: {
-						name: BarError.name,
-						fullName: BarError.fullName,
-						shortMessage: 'bar',
-						info: null,
-						cause: {
-							message: 'First of 2 errors : nested foo' +
-								' : whatever',
-							data: {
-								name: MultiError.name,
-								fullName: MultiError.fullName,
-								shortMessage: 'First of 2 errors : nested foo',
-								info: null,
-								cause: {
-									message: 'nested foo : whatever',
-									data: {
-										name: FooError.name,
-										fullName: FooError.fullName,
-										shortMessage: 'nested foo',
-										info: null,
-										cause: { message: 'whatever' },
-									},
-								},
-								errors: [
-									{
-										message: 'nested foo : whatever',
-										data: {
-											name: FooError.name,
-											fullName: FooError.fullName,
-											shortMessage: 'nested foo',
-											info: null,
-											cause: { message: 'whatever' },
-										},
-									},
-									{
-										message: 'nested bar',
-										data: {
-											name: BarError.name,
-											fullName: BarError.fullName,
-											shortMessage: 'nested bar',
-											info: { yay: 'huzzah' },
-										},
-									},
-								],
-							},
-						},
-					},
-				},
-			},
-		});
+		// Convert a NaniError structure and check the result.
+		expect(toObject(naniStructure.err)).to.deep.equal(naniStructure.obj);
 	});
 
 	it('converts JpiErrors into JSON-RPC error objects', function() {
-		// Create a structure of JpiErrors. These are NaniErrors, so there is
-		// no need to test everything again. We just want to make sure the
-		// numeric codes supported.
-		const err = new ServerError({
-			shortMessage: 'foo',
-			cause: new JpiError('bar', new ParseError('baz')),
-		});
-
-		// Convert the structure and check the result.
-		expect(toObject(err)).to.deep.equal({
-			message: 'foo : bar : baz',
-			code: ServerError.code,
-			data: {
-				name: ServerError.name,
-				fullName: ServerError.fullName,
-				shortMessage: 'foo',
-				info: null,
-				cause: {
-					message: 'bar : baz',
-					data: {
-						name: JpiError.name,
-						fullName: JpiError.fullName,
-						shortMessage: 'bar',
-						info: null,
-						cause: {
-							message: 'baz',
-							code: ParseError.code,
-							data: {
-								name: ParseError.name,
-								fullName: ParseError.fullName,
-								shortMessage: 'baz',
-								info: null,
-							},
-						},
-					},
-				},
-			},
-		});
+		// Covert a JpiError structure and check the result.
+		expect(toObject(jpiStructure.err)).to.deep.equal(jpiStructure.obj);
 	});
 
 	it('supports includeStacks argument', function() {
