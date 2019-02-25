@@ -4,7 +4,7 @@ const { NaniError } = require('nani');
 const { toObject } = require('../../cjs');
 
 describe('toObject', function() {
-	it('converts standard js errors into JSON-RPC error objects', function() {
+	it('converts standard js errors to JSON-RPC', function() {
 		// Try a plain Error.
 		expect(toObject(new Error('Omg bad error!'))).to.deep.equal({
 			message: 'Omg bad error!',
@@ -17,12 +17,12 @@ describe('toObject', function() {
 		});
 	});
 
-	it('converts arbitrary NaniErrors into JSON-RPC error objects', function() {
+	it('converts arbitrary NaniErrors to JSON-RPC', function() {
 		// Convert a NaniError structure and check the result.
 		expect(toObject(naniStructure.err)).to.deep.equal(naniStructure.obj);
 	});
 
-	it('converts JpiErrors into JSON-RPC error objects', function() {
+	it('converts JpiErrors to JSON-RPC', function() {
 		// Covert a JpiError structure and check the result.
 		expect(toObject(jpiStructure.err)).to.deep.equal(jpiStructure.obj);
 	});
