@@ -1,7 +1,7 @@
 {
   "name": "jpi-errors",
   "version": "0.0.0",
-  "description": "jpi error classes and handling utils",
+  "description": "Error classes and conversion utilities for Jpi",
   "author": "Steve Ripberger",
   "license": "MIT",
   "repository": "github:sripberger/jpi-errors",

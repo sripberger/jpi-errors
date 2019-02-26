@@ -1,2 +1,3 @@
 # jpi-errors
-jpi error classes and handling utils
+Error classes and conversion utilities for
+[Jpi](https://www.npmjs.com/package/jpi)
