@@ -2,17 +2,17 @@
 # https://github.com/documentationjs/documentation/blob/master/docs/CONFIG.md
 
 toc:
-    - name: Base Error Classes
+    - name: Base
     - JpiError
 
-    - name: JSON-RPC Standard Errors
+    - name: JSON-RPC Standard
     - ParseError
     - InvalidRequestError
     - MethodNotFoundError
     - InvalidParamsError
     - InternalError
 
-    - name: Implementation-Defined Errors
+    - name: Jpi-Specific
     - ServerError
 
     - name: Conversion Utils
