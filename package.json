@@ -20,7 +20,7 @@
     "nani": "^2.2.0"
   },
   "devDependencies": {
-    "@sripberger/eslint-config": "^1.0.1",
+    "@sripberger/eslint-config": "^1.0.2",
     "chai": "^4.2.0",
     "documentation": "^9.2.0",
     "eslint": "^5.14.1",
