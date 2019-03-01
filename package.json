@@ -18,20 +18,19 @@
   },
   "main": "cjs",
   "dependencies": {
-    "esm": "^3.2.6",
+    "esm": "^3.2.7",
     "lodash": "^4.17.11",
     "nani": "^2.2.0"
   },
   "devDependencies": {
     "@sripberger/eslint-config": "^1.0.3",
     "chai": "^4.2.0",
-    "documentation": "9.2.0",
+    "documentation": "^9.3.0",
     "eslint": "^5.14.1",
     "eslint-plugin-jsdoc": "^4.1.1",
     "gh-pages": "^2.0.1",
-    "highlight.js": "9.14.2",
     "mocha": "^6.0.2",
-    "sinon": "^7.2.4",
+    "sinon": "^7.2.5",
     "sinon-chai": "^3.3.0"
   }
 }
