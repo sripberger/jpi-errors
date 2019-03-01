@@ -106,8 +106,8 @@ for errors defined by the JSON-RPC standard:
   JSON-RPC Request object that specified a method that has not been registered.
 - `InvalidParamsError`: Code `-32602`, not actually thrown by Jpi, as Jpi does
   not come with a schema system. You'll want to throw this one yourself from a
-  middleware to indicate that the JSON-RPC request specified a method that does
-  exist, but one or more params were invalid.
+  middleware to indicate that the JSON-RPC request specified a method that has
+  been registered, but one or more params were invalid.
 - `InternalError`: Code `-32063`, not actually thrown by Jpi. To be honest I'm
   not sure what this is for, but I included it anyway because it's in the
   standard.  ¯\\_(ツ)_/¯
