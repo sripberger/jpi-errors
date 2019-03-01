@@ -3,6 +3,8 @@ Error classes and conversion utilities for
 [Jpi](https://www.npmjs.com/package/jpi), built using
 [Nani](https://www.npmjs.com/package/nani).
 
+Full api docs can be found [here](https://sripberger.github.io/jpi-errors/).
+
 ## Base Class: JpiError
 This module provides `JpiError`-- a base class for all errors defined by Jpi,
 and potentially your own application-defined errors. `JpiError` extends
@@ -89,7 +91,7 @@ you'll probably want to keep them all in one place or otherwise document them,
 so any clients can easily look them up.
 
 Any error codes less than `-33000` are reserved, however, according to the
-JSON-RPC standard. `-32000` is used by Jpi iself, as described above, while
+JSON-RPC standard. `-32000` is used by Jpi itself, as described above, while
 others in this range appear in this library as well. Read below for more
 information.
 
@@ -133,7 +135,7 @@ instances into JSON-RPC-compliant error objects. The following functions are
 included in this package for this purpose:
 
 - `toObject`: Converts an error instance into a JSON-RPC Error object.
-- `fromObject`: Convers a JSON-RPC Error object to an error instance.
+- `fromObject`: Converts a JSON-RPC Error object to an error instance.
 
 `toObject` is used by Jpi itself, whereas clients will want to use `fromObject`
 to rebuild error structures built by Jpi.
