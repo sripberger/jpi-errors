@@ -117,6 +117,16 @@ may not want to check for them yourself when writing a Jpi client, but
 aside from the `InvalidParamsError` you should not normally need to throw them
 yourself.
 
+
+## Implementation-Defined Errors
+Jpi also uses a couple errors with codes unique to itself:
+
+- `ServerError`: Code `-32000`, generic server error, described above.
+- `RequestFailedError`: Code `-32001`, thrown when Jpi fails to read the entire
+  http request stream due to an error in that stream. This should be rare if it
+  happens at all, but clients should handle it just in case.
+
+
 ## Conversion Utilities
 As Jpi is a JSON-RPC framework, it needs some way of converting between JS error
 instances into JSON-RPC-compliant error objects. The following functions are

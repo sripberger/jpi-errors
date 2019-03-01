@@ -7,7 +7,7 @@ describe('ServerError', function() {
 		expect(new ServerError()).to.be.an.instanceof(JpiError);
 	});
 
-	it('has standard JSON-RPC code', function() {
+	it('has implementation-defined error code', function() {
 		expect(ServerError.code).to.equal(SERVER_ERROR);
 	});
 

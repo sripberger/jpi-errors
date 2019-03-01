@@ -5,6 +5,9 @@
   "author": "Steve Ripberger",
   "license": "MIT",
   "repository": "github:sripberger/jpi-errors",
+  "keywords": [
+    "jpi"
+  ],
   "scripts": {
     "lint": "eslint .",
     "unit": "mocha -r esm test/setup.js test/unit",
