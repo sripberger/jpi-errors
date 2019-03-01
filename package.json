@@ -1,6 +1,6 @@
 {
   "name": "jpi-errors",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Error classes and conversion utilities for Jpi",
   "author": "Steve Ripberger",
   "license": "MIT",
